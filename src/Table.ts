@@ -416,8 +416,8 @@ export class Table {
   private newDeck (): Card[] {
     const newDeck: Card[] = [];
     Object.keys(CardSuit).forEach(suit => {
-      Object.keys(CardRank).forEach(value => {
-        newDeck.push(new Card(value as CardRank, suit as CardSuit));
+      Object.keys(CardRank).forEach(rank => {
+        newDeck.push(new Card(CardRank[rank as keyof typeof CardRank], CardSuit[suit as keyof typeof CardSuit]));
       });
     });
     for (let index = newDeck.length - 1; index > 0; index--) {

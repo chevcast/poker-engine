@@ -1,5 +1,5 @@
 {
-  "name": "poker-engine",
+  "name": "@chevtek/poker-engine",
   "version": "1.0.0",
   "description": "A headless no-limit Texas Hold'em engine written completely in node.",
   "main": "./build/index.js",

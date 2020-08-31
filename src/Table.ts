@@ -44,25 +44,6 @@ export class Table {
     return this.players.filter(player => !player.folded);
   }
 
-  moveDealer() {
-    if (this.dealerPosition === undefined) {
-      this.dealerPosition = 0;
-    } else {
-      this.dealerPosition++;
-    }
-    if (this.dealerPosition === this.players.length) {
-      this.dealerPosition = 0;
-    }
-    this.smallBlindPosition = this.dealerPosition + 1;
-    if (this.smallBlindPosition === this.players.length) {
-      this.smallBlindPosition = 0;
-    }
-    this.bigBlindPosition = this.dealerPosition + 2;
-    if (this.bigBlindPosition >= this.players.length) {
-      this.bigBlindPosition -= this.players.length;
-    }
-  }
-
   get currentPot () {
     // If there is no pot, create one.
     if (this.pots.length === 0) {
@@ -78,6 +59,25 @@ export class Table {
       return;
     }
     return this.pots.slice(1, this.pots.length - 1)
+  }
+
+  moveDealer() {
+    if (this.dealerPosition === undefined) {
+      this.dealerPosition = 0;
+    } else {
+      this.dealerPosition++;
+    }
+    if (this.dealerPosition >= this.players.length) {
+      this.dealerPosition -= this.players.length * Math.floor(this.dealerPosition / this.players.length);
+    }
+    this.smallBlindPosition = this.dealerPosition + 1;
+    if (this.smallBlindPosition >= this.players.length) {
+      this.smallBlindPosition -= this.players.length * Math.floor(this.smallBlindPosition / this.players.length) + 1;
+    }
+    this.bigBlindPosition = this.dealerPosition + 2;
+    if (this.bigBlindPosition >= this.players.length) {
+      this.bigBlindPosition -= this.players.length * Math.floor(this.bigBlindPosition / this.players.length);
+    }
   }
 
   sitDown(id: string, buyIn: number) {
@@ -98,6 +98,7 @@ export class Table {
       this.cleanUp();
     }
     this.players.push(newPlayer);
+    return this.players.length - 1;
   }
 
   standUp(player: Player | string): void {
@@ -145,6 +146,10 @@ export class Table {
 
     // Empty pots.
     this.pots = [new Pot()];
+
+    // Remove last raise and current bet.
+    delete this.lastRaise;
+    delete this.currentBet;
   }
 
   dealCards () {

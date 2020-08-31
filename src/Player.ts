@@ -97,10 +97,13 @@ export class Player {
         this.stackSize = 0;
         this.table.currentBet = this.bet;
       } else if (amount >= minRaise) {
-        this.bet += amount;
-        this.stackSize -= amount;
+        this.stackSize -= amount - this.bet;
+        this.bet = amount;
         this.table.currentBet = this.bet; 
-        this.raise = this.table.lastRaise = currentBet ? amount - currentBet : amount;
+        // Only mark raise values if there is a current bet.
+        if (currentBet) {
+          this.raise = this.table.lastRaise = amount - currentBet;
+        }
         // Set last action to the player behind this one.
         this.table.lastPosition = this.table.currentPosition! - 1;
         if (this.table.lastPosition === -1) this.table.lastPosition = this.table.players.length - 1;
@@ -139,13 +142,13 @@ export class Player {
       } else {
         if (this.bet === currentBet) {
           actions.push("check");
-          if (this.stackSize > currentBet && this.table.actingPlayers.length > 1) {
+          if (this.stackSize > currentBet && this.table.actingPlayers.length > 0) {
             actions.push("raise");
           }
         }
         if (this.bet < currentBet) {
           actions.push("call");
-          if (this.stackSize > currentBet && this.table.actingPlayers.length > 1 && (!lastRaise || !this.raise || lastRaise >= this.raise)) {
+          if (this.stackSize > currentBet && this.table.actingPlayers.length > 0 && (!lastRaise || !this.raise || lastRaise >= this.raise)) {
             actions.push("raise");
           }
         }

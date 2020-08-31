@@ -219,9 +219,9 @@ If winners have been determined then then this property will store them. Usually
 
 This method begins the hand. Assigns players their hole cards and starts the first round of betting.
 
-#### `sitDown(id: string, buyIn: number): void`
+#### `sitDown(id: string, buyIn: number): number`
 
-This method allows you to seat a new player at the table. If there is an active hand then they are automatically marked as `folded: true` so that the action will skip them until a new hand is started.
+This method allows you to seat a new player at the table. If there is an active hand then they are automatically marked as `folded: true` so that the action will skip them until a new hand is started. This method returns the seat index the player was placed at.
 
 #### `standUp(player: Player | string): void`
 

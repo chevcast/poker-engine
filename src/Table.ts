@@ -293,11 +293,11 @@ export class Table {
 
     const resetPosition = () => {
       // Set action to first player after dealer.
-      this.currentPosition = this.dealerPosition + 1;
+      this.currentPosition = this.dealerPosition! + 1;
       if (this.currentPosition === this.players.length) {
         this.currentPosition = 0;
       }
-      this.lastPosition = this.dealerPosition;
+      this.lastPosition = this.dealerPosition!;
       if (!this.actingPlayers.includes(this.currentActor!) || this.actingPlayers.length <= 1) {
         this.nextAction();
       }

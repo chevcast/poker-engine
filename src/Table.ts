@@ -56,7 +56,8 @@ export class Table {
   }
 
   get dealer () {
-    return this.dealerPosition !== undefined && this.players[this.dealerPosition];
+    if (!this.dealerPosition) return;
+    return this.players[this.dealerPosition];
   }
 
   get sidePots () {

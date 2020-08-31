@@ -177,9 +177,17 @@ This property returns the currently active pot, ignoring any side pots.
 
 If there is an active betting round then this will return one of: `"pre-flop"`, `"flop"`, `"turn"`, `"river"`. Otherwise this will return `undefined`.
 
+#### `dealer: Player | undefined`
+
+If there is at least one player at the table then the dealer position will be assigned and this property will return the player in the dealer seat. Otherwise this will return `undefined`.
+
 #### `dealerPosition: number | undefined`
 
 If there is an active hand then this property will return the position of the dealer. Otherwise it will return `undefined`.
+
+#### `handNumber: number`
+
+This property returns a number representing the number of hands played at this table so far.
 
 #### `lastPosition: number | undefined`
 

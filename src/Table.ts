@@ -9,6 +9,7 @@ export class Table {
   public currentBet?: number;
   public dealerPosition?: number;
   public debug: boolean = false;
+  public handNumber: number = 0;
   public lastPosition?: number;
   public lastRaise?: number;
   public players: Player[] = [];
@@ -54,6 +55,10 @@ export class Table {
     return this.pots[this.pots.length - 1];
   }
 
+  get dealer () {
+    return this.dealerPosition !== undefined && this.players[this.dealerPosition];
+  }
+
   get sidePots () {
     if (this.pots.length <= 1) {
       return;
@@ -62,19 +67,17 @@ export class Table {
   }
 
   moveDealer() {
-    if (this.dealerPosition === undefined) {
-      this.dealerPosition = 0;
-    } else {
-      this.dealerPosition++;
+    if (this.handNumber > 1) {
+      this.dealerPosition!++;
     }
-    if (this.dealerPosition >= this.players.length) {
-      this.dealerPosition -= this.players.length * Math.floor(this.dealerPosition / this.players.length);
+    if (this.dealerPosition! >= this.players.length) {
+      this.dealerPosition! -= this.players.length * Math.floor(this.dealerPosition! / this.players.length);
     }
-    this.smallBlindPosition = this.dealerPosition + 1;
+    this.smallBlindPosition = this.dealerPosition! + 1;
     if (this.smallBlindPosition >= this.players.length) {
       this.smallBlindPosition -= this.players.length * Math.floor(this.smallBlindPosition / this.players.length) + 1;
     }
-    this.bigBlindPosition = this.dealerPosition + 2;
+    this.bigBlindPosition = this.dealerPosition! + 2;
     if (this.bigBlindPosition >= this.players.length) {
       this.bigBlindPosition -= this.players.length * Math.floor(this.bigBlindPosition / this.players.length);
     }
@@ -97,6 +100,9 @@ export class Table {
     } else {
       this.cleanUp();
     }
+    if (!this.dealerPosition) {
+      this.dealerPosition = 0;
+    }
     this.players.push(newPlayer);
     return this.players.length - 1;
   }
@@ -116,7 +122,15 @@ export class Table {
       }
     } else {
       const playerIndex = this.players.indexOf(player);
+      delete this.dealerPosition;
       this.players.splice(playerIndex, 1);
+      if (playerIndex === this.dealerPosition) {
+        if (this.players.length === 0) {
+          delete this.dealerPosition;
+        } else {
+          this.moveDealer();
+        }
+      }
     }
   }
 
@@ -167,6 +181,9 @@ export class Table {
 
     // Set round to pre-flop.
     this.currentRound = BettingRound.PRE_FLOP;
+
+    // Increase hand number.
+    this.handNumber++;
 
     // Move dealer and blind positions.
     this.moveDealer();
@@ -276,7 +293,7 @@ export class Table {
 
     const resetPosition = () => {
       // Set action to first player after dealer.
-      this.currentPosition = this.dealerPosition! + 1;
+      this.currentPosition = this.dealerPosition + 1;
       if (this.currentPosition === this.players.length) {
         this.currentPosition = 0;
       }

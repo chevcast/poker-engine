@@ -8,23 +8,18 @@ npm install @chevtek/poker-engine
 
 ## Usage
 
-This engine is designed around an instance of a `Table`. Simply create a new table and players and seat the players at the tabel.
+This engine is designed around an instance of a `Table`. Simply create a new table, seat players, and deal the cards!
 
 ```js
-const { Table, Player } = require("@chevtek/poker-engine");
+const { Table } = require("@chevtek/poker-engine");
 
 // new Table(minBuyIn = 1000, smallBlind = 10, bigBlind = 20);
 const table = new Table();
 
-// new Player(id, name);
-const player1 = new Player(1, "Player 1");
-const player2 = new Player(2, "Player 2");
-const player3 = new Player(3, "Player 3");
-
-// table.sitDown(player, buyIn);
-table.sitDown(player1, 1000);
-table.sitDown(player2, 1000);
-table.sitDown(player3, 1000);
+// table.sitDown(id, buyIn);
+table.sitDown("Player 1", 1000);
+table.sitDown("Player 2", 1000);
+table.sitDown("Player 3", 1000);
 ```
 
 Once there are two or more players seated at the table you can begin the hand and then read from the player list to find their hole cards.
@@ -64,17 +59,13 @@ console.log(table.winners);
 ## Example of a complete hand
 
 ```js
-const { Table, Player } = require("@chevtek/poker-engine");
+const { Table } = require("@chevtek/poker-engine");
 
 const table = new Table();
 
-const player1 = new Player(1, "Player 1");
-const player2 = new Player(2, "Player 2");
-const player3 = new Player(3, "Player 3");
-
-table.sitDown(player1, 1000);
-table.sitDown(player2, 1000);
-table.sitDown(player3, 1000);
+table.sitDown("Player 1", 1000);
+table.sitDown("Player 2", 1000);
+table.sitDown("Player 3", 1000);
 
 table.dealCards();
 
@@ -85,7 +76,7 @@ table.currentActor.callAction();
 // player 2 is first to act on the flop.
 table.currentActor.checkAction();
 
-// player 3 decideds to open the bet on the flop.
+// player 3 decides to open the bet on the flop.
 table.currentActor.betAction(20);
 
 // player 1 raises.
@@ -178,7 +169,7 @@ If there is an active bet that other players must call then this property will r
 
 If there is an active hand then this property will return the position of the current actor. Otherwise it will return `undefined`.
 
-#### `currentPot: { amount: number, eligibilePlayers: Player[] }`
+#### `currentPot: { amount: number, eligiblePlayers: Player[] }`
 
 This property returns the currently active pot, ignoring any side pots.
 
@@ -188,7 +179,7 @@ If there is an active betting round then this will return one of: `"pre-flop"`, 
 
 #### `dealerPosition: number | undefined`
 
-If there is an active hand then this property will return the position of the dealer. Othwerwise it will return `undefined`.
+If there is an active hand then this property will return the position of the dealer. Otherwise it will return `undefined`.
 
 #### `lastPosition: number | undefined`
 

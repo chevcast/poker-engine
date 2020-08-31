@@ -1,0 +1,25 @@
+{
+  "name": "poker-engine",
+  "version": "1.0.0",
+  "description": "A headless no-limit Texas Hold'em engine written completely in node.",
+  "main": "./build/index.js",
+  "scripts": {
+    "install": "npm run build",
+    "clean": "rimraf ./build",
+    "build": "npm run clean &&tsc --project ./tsconfig.json"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Chev",
+    "email": "chev@chevtek.io",
+    "url": "https://chevtek.io"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "pokersolver": "^2.1.4"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "typescript": "^4.0.2"
+  }
+}

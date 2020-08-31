@@ -8,7 +8,11 @@
     "clean": "rimraf ./build",
     "build": "npm run clean &&tsc --project ./tsconfig.json"
   },
-  "keywords": [],
+  "keywords": ["poker", "texas holdem", "texas hold'em", "holdem", "hold'em"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chevtek/poker-engine.git"
+  },
   "author": {
     "name": "Chev",
     "email": "chev@chevtek.io",

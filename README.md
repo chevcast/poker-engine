@@ -210,6 +210,10 @@ This will return an array of all pots on the table. Usually there is only one, b
 
 This will return an array of all pots except for the currently active pot. If there are no side pots then this returns `undefined`.
 
+#### `smallBlind: number = 10`
+
+The amount of the small blind bet for the table. Default is `10`.
+
 #### `smallBlindPosition: number | undefined`
 
 If there is an active hand then this property will return the position of the small blind. Otherwise this will return `undefined`.
@@ -231,3 +235,47 @@ This method allows you to seat a new player at the table. If there is an active 
 #### `standUp(player: Player | string): void`
 
 This method allows you to remove a player from the table. It accepts a `Player` object or an ID string. If there is an active hand then the player is marked to leave but not actually removed. When a new hand is dealt any players marked to leave will be removed. This is so the hand logic is not interrupted when gathering bets from folded players.
+
+## Player
+
+### Properties
+
+#### `bet: number = 0`
+
+This property stores the amount of the individual player's current bet. By default this is zero until they make a bet.
+
+#### `folded: boolean = false`
+
+This property stores whether or not the player has folded. By default this is `false`.
+
+#### `hand: { name: string, descr: string }`
+
+This property returns the user's current hand. `name` is a string representing the type of hand such as `"Flush"` or `"Two Pair"`. `descr` is a string that contains the type of hand and the cards that make up that hand such as `"Two Pair, A's and Q's"`.
+
+#### `holeCards: [Card, Card] | undefined`
+
+If there is an active hand this property will return a two-element array containing the player's hole cards they have been dealt. Otherwise this will return `undefined`.
+
+#### `id: string`
+
+A unique ID for the player. This is passed into the `table.sitDown` method when adding a player to the table and it allows you to uniquely identify the player in your own code.
+
+#### `left: boolean = false`
+
+This property is `true` if the player has "stood up" from the table but there is an active hand. Players marked with `left: true` will be removed from the table when the hand is over. This way they are still present while the hand they were part of plays out.
+
+#### `raise: number | undefined`
+
+This property stores the amount of the player's last raise. If they have not made a raise then this property is `undefined`.
+
+#### `showCards: boolean = false`
+
+This property can be used to determine if the player's hole cards should be shown. This is marked `true` if the player is still in play during showdown where winners are determined.
+
+#### `stackSize: number`
+
+This property stores the amount of money the player has left. The initial value is passed in as the second argument when you call `table.sitDown`.
+
+#### `table: Table`
+
+This property is simply a convenience reference back to the table the player is part of.

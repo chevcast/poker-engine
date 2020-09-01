@@ -1,4 +1,4 @@
-# poker-engine
+# poker-engine v{{version}}
 
 ## Installation
 

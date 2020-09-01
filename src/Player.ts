@@ -97,8 +97,7 @@ export class Player {
         this.stackSize = 0;
         this.table.currentBet = this.bet;
       } else if (amount >= minRaise) {
-        this.stackSize -= amount - this.bet;
-        this.bet = amount;
+        this.stackSize -= this.bet = amount;
         this.table.currentBet = this.bet; 
         // Only mark raise values if there is a current bet.
         if (currentBet) {

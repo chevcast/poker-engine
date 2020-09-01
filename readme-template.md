@@ -9,7 +9,7 @@
 ## Installation
 
 ```bash
-npm install @chevtek/poker-engine
+npm install {{name}}
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ npm install @chevtek/poker-engine
 This engine is designed around an instance of a `Table`. Simply create a new table, seat players, and deal the cards!
 
 ```js
-const { Table } = require("@chevtek/poker-engine");
+const { Table } = require("{{name}}");
 
 // new Table(minBuyIn = 1000, smallBlind = 10, bigBlind = 20);
 const table = new Table();

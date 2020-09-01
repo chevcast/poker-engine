@@ -1,4 +1,10 @@
-# poker-engine v{{version}}
+# {{name}} v{{version}}
+
+{{description}}
+
+> {{author.name}}
+> {{author.email}}
+> {{author.url}}
 
 ## Installation
 

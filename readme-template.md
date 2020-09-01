@@ -2,9 +2,9 @@
 
 {{description}}
 
-> {{author.name}}
-> {{author.email}}
-> {{author.url}}
+> {{author.name}}  
+> {{author.email}}  
+> {{author.url}}  
 
 ## Installation
 

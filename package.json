@@ -4,7 +4,7 @@
   "description": "A headless no-limit Texas Hold'em engine written completely in node.",
   "main": "./build/index.js",
   "scripts": {
-    "prepublishOnly": "node ./generate-readme.js",
+    "version": "node ./generate-readme.js",
     "install": "npm run build",
     "clean": "rimraf ./build",
     "build": "npm run clean &&tsc --project ./tsconfig.json"

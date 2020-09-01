@@ -64,7 +64,7 @@ export class Table {
     if (this.pots.length <= 1) {
       return;
     }
-    return this.pots.slice(1, this.pots.length - 1)
+    return this.pots.slice(0, this.pots.length - 1)
   }
 
   moveDealer() {
@@ -123,7 +123,6 @@ export class Table {
       }
     } else {
       const playerIndex = this.players.indexOf(player);
-      delete this.dealerPosition;
       this.players.splice(playerIndex, 1);
       if (playerIndex === this.dealerPosition) {
         if (this.players.length === 0) {
@@ -140,9 +139,14 @@ export class Table {
     const leavingPlayers = this.players.filter(player => player.left);
     leavingPlayers.forEach(player => this.standUp(player));
 
+    // Grab reference to player in dealer position.
+    const dealer = this.dealer;
     // Remove busted players;
     const bustedPlayers = this.players.filter(player => player.stackSize === 0);
     bustedPlayers.forEach(player => this.standUp(player));
+    if (dealer) {
+      this.dealerPosition = this.players.indexOf(dealer);
+    }
 
     // Reset player bets, hole cards, and fold status.
     this.players.forEach(player => { 

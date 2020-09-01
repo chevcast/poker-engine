@@ -76,7 +76,7 @@ export class Table {
     }
     this.smallBlindPosition = this.dealerPosition! + 1;
     if (this.smallBlindPosition >= this.players.length) {
-      this.smallBlindPosition -= this.players.length * Math.floor(this.smallBlindPosition / this.players.length) + 1;
+      this.smallBlindPosition -= this.players.length * Math.floor(this.smallBlindPosition / this.players.length);
     }
     this.bigBlindPosition = this.dealerPosition! + 2;
     if (this.bigBlindPosition >= this.players.length) {

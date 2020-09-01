@@ -5,7 +5,7 @@
   "main": "./build/index.js",
   "scripts": {
     "version": "node ./generate-readme.js && git add ./README.md",
-    "postversion": "npm publish",
+    "postversion": "npm publish && git push",
     "install": "npm run build",
     "clean": "rimraf ./build",
     "build": "npm run clean &&tsc --project ./tsconfig.json"

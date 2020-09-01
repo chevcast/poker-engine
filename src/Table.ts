@@ -226,7 +226,7 @@ export class Table {
   nextAction () {
 
     // See if everyone has folded.
-    if (this.activePlayers.length === 0) {
+    if (this.activePlayers.length === 1) {
       delete this.currentRound;
       this.showdown();
       return;

@@ -4,9 +4,9 @@ import { Card, CardSuit, CardRank, Player } from ".";
 export class Table {
   public bigBlindPosition?: number;
   public communityCards: Card[] = [];
+  public currentBet?: number;
   public currentPosition?: number;
   public currentRound?: BettingRound;
-  public currentBet?: number;
   public dealerPosition?: number;
   public debug: boolean = false;
   public deck: Card[] = [];

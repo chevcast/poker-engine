@@ -9,6 +9,7 @@ export class Table {
   public currentBet?: number;
   public dealerPosition?: number;
   public debug: boolean = false;
+  public deck: Card[] = [];
   public handNumber: number = 0;
   public lastPosition?: number;
   public lastRaise?: number;
@@ -16,8 +17,6 @@ export class Table {
   public pots: Pot[] = [];
   public smallBlindPosition?: number;
   public winners?: Player[];
-
-  private deck: Card[] = [];
 
   constructor (
     public buyIn: number = 1000,
@@ -410,37 +409,7 @@ export class Table {
     });
   }
 
-  public toJson () {
-    return {
-      debug: this.debug,
-      currentRound: this.currentRound,
-      currentBet: this.currentBet,
-      lastRaise: this.lastRaise,
-      dealerPosition: this.dealerPosition,
-      currentPosition: this.currentPosition,
-      lastPosition: this.lastPosition,
-      currentActor: this.currentActor?.id,
-      winners: this.winners?.map(player => ({
-        id: player.id,
-        hand: player.hand.descr
-      })),
-      pots: this.pots.map(pot => ({
-        amount: pot.amount,
-        players: pot.eligiblePlayers.map(player => player.id)
-      })),
-      players: this.players.map(player => ({
-        id: player.id,
-        bet: player.bet,
-        stackSize: player.stackSize,
-        raise: player.raise,
-        folded: player.folded,
-        holeCards: player.holeCards?.map(card => `${card.rank}${card.suitChar}`).join(),
-        hand: player.hand.descr
-      }))
-    }
-  }
-
-  private newDeck (): Card[] {
+  newDeck (): Card[] {
     const newDeck: Card[] = [];
     Object.keys(CardSuit).forEach(suit => {
       Object.keys(CardRank).forEach(rank => {
@@ -454,7 +423,6 @@ export class Table {
     return newDeck;
   }
 }
-
 
 export class Pot {
   amount: number = 0;

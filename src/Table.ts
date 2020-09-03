@@ -13,7 +13,7 @@ export class Table {
   public handNumber: number = 0;
   public lastPosition?: number;
   public lastRaise?: number;
-  public players: Player[] = [];
+  public players: (Player|null)[] = [null, null, null, null, null, null, null, null, null, null];
   public pots: Pot[] = [];
   public smallBlindPosition?: number;
   public winners?: Player[];
@@ -34,14 +34,14 @@ export class Table {
   }
 
   get actingPlayers () {
-    return this.players.filter(player => !player.folded
+    return this.players.filter(player => player && !player.folded
       && player.stackSize > 0
       && (!this.currentBet || !player.raise || (this.currentBet && player.bet < this.currentBet))
-    );
+    ) as Player[];
   }
 
   get activePlayers () {
-    return this.players.filter(player => !player.folded);
+    return this.players.filter(player => player && !player.folded) as Player[];
   }
 
   get currentPot () {
@@ -59,6 +59,16 @@ export class Table {
     return this.players[this.dealerPosition];
   }
 
+  get smallBlindPlayer () {
+    if (!this.smallBlindPosition) return;
+    return this.players[this.smallBlindPosition];
+  }
+
+  get bigBlindPlayer () {
+    if (!this.bigBlindPosition) return;
+    return this.players[this.bigBlindPosition];
+  }
+
   get sidePots () {
     if (this.pots.length <= 1) {
       return;
@@ -73,26 +83,48 @@ export class Table {
     if (this.dealerPosition! >= this.players.length) {
       this.dealerPosition! -= this.players.length * Math.floor(this.dealerPosition! / this.players.length);
     }
+    while (this.dealer === null) {
+      this.dealerPosition!++;
+      if (this.dealerPosition! >= this.players.length) {
+        this.dealerPosition! -= this.players.length * Math.floor(this.dealerPosition! / this.players.length);
+      }
+    }
     this.smallBlindPosition = this.dealerPosition! + 1;
     if (this.smallBlindPosition >= this.players.length) {
       this.smallBlindPosition -= this.players.length * Math.floor(this.smallBlindPosition / this.players.length);
     }
-    this.bigBlindPosition = this.dealerPosition! + 2;
+    while (this.smallBlindPlayer === null) {
+      this.smallBlindPosition!++;
+      if (this.smallBlindPosition! >= this.players.length) {
+        this.smallBlindPosition! -= this.players.length * Math.floor(this.smallBlindPosition! / this.players.length);
+      }
+    }
+    this.bigBlindPosition = this.smallBlindPosition! + 1;
     if (this.bigBlindPosition >= this.players.length) {
       this.bigBlindPosition -= this.players.length * Math.floor(this.bigBlindPosition / this.players.length);
     }
+    while (this.bigBlindPlayer === null) {
+      this.bigBlindPosition!++;
+      if (this.bigBlindPosition! >= this.players.length) {
+        this.bigBlindPosition! -= this.players.length * Math.floor(this.bigBlindPosition! / this.players.length);
+      }
+    }
   }
 
-  sitDown(id: string, buyIn: number) {
-    if (this.players.length === 10) {
+  sitDown(id: string, buyIn: number, seatNumber?: number) {
+    // If there are no null seats then the table is full.
+    if (this.players.filter(player => player === null).length === 0) {
       throw new Error("The table is currently full.");
     }
     if (buyIn < this.buyIn) {
       throw new Error(`Your buy-in must be greater or equal to the minimum buy-in of ${this.buyIn}.`);
     }
-    const existingPlayers = this.players.filter(player => player.id === id);
+    const existingPlayers = this.players.filter(player => player && player.id === id);
     if (existingPlayers.length > 0 && !this.debug) {
       throw new Error("Player already joined this table.");
+    }
+    if (seatNumber && this.players[seatNumber] !== null) {
+      throw new Error("There is already a player in the requested seat.");
     }
     const newPlayer = new Player(id, buyIn, this);
     if (this.currentRound) {
@@ -100,19 +132,29 @@ export class Table {
     } else {
       this.cleanUp();
     }
-    if (!this.dealerPosition) {
-      this.dealerPosition = 0;
+    if (this.dealerPosition === undefined || !this.dealer) {
+      this.dealerPosition = seatNumber ?? 0;
     }
-    this.players.push(newPlayer);
-    return this.players.length - 1;
+    if (!seatNumber) {
+      seatNumber = 0;
+      while (this.players[seatNumber] !== null) {
+        seatNumber++;
+        if (seatNumber >= this.players.length) {
+          throw new Error("No available seats!");
+        }
+      }
+    }
+    this.players[seatNumber] = newPlayer;
+    return seatNumber;
   }
 
   standUp(player: Player | string): void {
     if (typeof player === "string") {
-      [player] = this.players.filter(p => p.id === player);
-      if (!player) {
+      const [foundPlayer] = this.players.filter(p => p && p.id === player);
+      if (!foundPlayer) {
         throw new Error(`No player found.`);
       }
+      player = foundPlayer;
     }
     if (this.currentRound) {
       player.folded = true;
@@ -122,7 +164,7 @@ export class Table {
       }
     } else {
       const playerIndex = this.players.indexOf(player);
-      this.players.splice(playerIndex, 1);
+      this.players[playerIndex] = null;
       if (playerIndex === this.dealerPosition) {
         if (this.players.length === 0) {
           delete this.dealerPosition;
@@ -135,20 +177,21 @@ export class Table {
 
   cleanUp () {
     // Remove players who left;
-    const leavingPlayers = this.players.filter(player => player.left);
-    leavingPlayers.forEach(player => this.standUp(player));
+    const leavingPlayers = this.players.filter(player => player && player.left);
+    leavingPlayers.forEach(player => player && this.standUp(player));
 
     // Grab reference to player in dealer position.
     const dealer = this.dealer;
     // Remove busted players;
-    const bustedPlayers = this.players.filter(player => player.stackSize === 0);
-    bustedPlayers.forEach(player => this.standUp(player));
+    const bustedPlayers = this.players.filter(player => player && player.stackSize === 0);
+    bustedPlayers.forEach(player => player && this.standUp(player));
     if (dealer) {
       this.dealerPosition = this.players.indexOf(dealer);
     }
 
     // Reset player bets, hole cards, and fold status.
     this.players.forEach(player => { 
+      if (!player) return;
       player.bet = 0;
       delete player.raise;
       delete player.holeCards;
@@ -193,8 +236,8 @@ export class Table {
     this.moveDealer();
 
     // Force small and big blind bets and set current bet amount.
-    const sbPlayer = this.players[this.smallBlindPosition!];
-    const bbPlayer = this.players[this.bigBlindPosition!]
+    const sbPlayer = this.players[this.smallBlindPosition!]!;
+    const bbPlayer = this.players[this.bigBlindPosition!]!
     sbPlayer.stackSize -= sbPlayer.bet = this.smallBlind;
     bbPlayer.stackSize -= bbPlayer.bet = this.bigBlind;
     this.currentBet = this.bigBlind;
@@ -215,6 +258,7 @@ export class Table {
 
     // Deal cards to players.
     this.players.forEach(player => {
+      if (!player) return;
       player.holeCards = [
         this.deck.pop()!,
         this.deck.pop()!
@@ -241,6 +285,12 @@ export class Table {
     if (this.currentPosition! >= this.players.length) {
       this.currentPosition! -= this.players.length;
     }
+    while (this.currentActor === null) {
+      this.currentPosition!++;
+      if (this.currentPosition! >= this.players.length) {
+        this.currentPosition! -= this.players.length;
+      }
+    }
 
     // If the player has folded or is all-in then move the action again.
     if (this.currentActor!.folded || this.currentActor!.stackSize === 0 || (!this.currentBet && this.actingPlayers.length === 1)) {
@@ -251,18 +301,21 @@ export class Table {
   gatherBets () {
 
     // Obtain all players who placed bets.
-    const bettingPlayers = this.players.filter(player => player.bet > 0);
+    const bettingPlayers = this.players.filter(player => player && player.bet > 0);
 
     // Check for all-in players.
-    let allInPlayers = bettingPlayers.filter(player => player.bet && player.stackSize === 0);
+    let allInPlayers = bettingPlayers.filter(player => player && player.bet && player.stackSize === 0);
 
     // Iterate over them and gather bets until there are no more all in players.
     while (allInPlayers.length > 0) {
       // Find lowest all-in player.
-      const lowestAllInBet = allInPlayers.map(player => player.bet).reduce((prevBet, evalBet) => evalBet < prevBet ? evalBet : prevBet);
+      const lowestAllInBet = allInPlayers
+        .filter(player => player !== null)
+        .map(player => player!.bet)
+        .reduce((prevBet, evalBet) => evalBet < prevBet ? evalBet : prevBet);
       // If other players have bet more than the lowest all-in player then subtract the lowest all-in amount from their bet and add it to the pot.
       bettingPlayers.forEach(player => {
-        if (player.bet === 0) return;
+        if (!player || player.bet === 0) return;
         if (player.bet >= lowestAllInBet) {
           player.bet -= lowestAllInBet;
           this.currentPot.amount += lowestAllInBet;
@@ -279,14 +332,14 @@ export class Table {
         }
       });
       // Check for all-in players again.
-      allInPlayers = allInPlayers.filter(player => player.bet && player.stackSize === 0);
+      allInPlayers = allInPlayers.filter(player => player && player.bet && player.stackSize === 0);
       // Create new pot.
       this.pots.push(new Pot());
     }
 
     // Once we're done with all-in players add the remaining bets to the pot.
     bettingPlayers.forEach(player => {
-      if (player.bet === 0) return;
+      if (!player || player.bet === 0) return;
       this.currentPot.amount += player.bet;
       player.bet = 0;
       if (!this.currentPot.eligiblePlayers.includes(player)) {
@@ -375,7 +428,10 @@ export class Table {
 
         break;
       case BettingRound.RIVER:
-        this.players.forEach(player => player.showCards = !player.folded);
+        this.players.forEach(player => {
+          if (!player) return;
+          player.showCards = !player.folded
+        });
         this.showdown();
         break;
     }
@@ -398,10 +454,13 @@ export class Table {
       })).map((hand: any) => hand.player);
 
     if (this.activePlayers.length > 1) {
-      this.activePlayers.forEach(player => player.showCards = true);
+      this.activePlayers.forEach(player => {
+        if (!player) return;
+        player.showCards = true
+      });
     }
 
-    this.winners = findWinners(this.activePlayers);
+    this.winners = findWinners(this.activePlayers as Player[]);
 
     // Distribute pots and mark winners.
     this.pots.forEach(pot => {

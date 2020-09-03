@@ -226,7 +226,6 @@ export class Table {
 
     // See if everyone has folded.
     if (this.activePlayers.length === 1) {
-      delete this.currentRound;
       this.showdown();
       return;
     }
@@ -376,7 +375,6 @@ export class Table {
 
         break;
       case BettingRound.RIVER:
-        delete this.currentRound;
         this.players.forEach(player => player.showCards = !player.folded);
         this.showdown();
         break;
@@ -384,9 +382,7 @@ export class Table {
   }
   
   showdown () {
-    if (this.currentRound) {
-      throw new Error("Showdown called while there is still an active hand!");
-    }
+    delete this.currentRound;
     delete this.currentPosition;
     delete this.lastPosition;
 

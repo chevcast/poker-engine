@@ -267,13 +267,17 @@ export class Table {
         if (player.bet >= lowestAllInBet) {
           player.bet -= lowestAllInBet;
           this.currentPot.amount += lowestAllInBet;
-          this.currentPot.eligiblePlayers.push(player);
+          if (!this.currentPot.eligiblePlayers.includes(player)) {
+            this.currentPot.eligiblePlayers.push(player);
+          }
           return;
         }
         // Gather bets from folded players and players who only called the lowest all-in.
         this.currentPot.amount += player.bet;
-        this.currentPot.eligiblePlayers.push(player);
         player.bet = 0;
+        if (!this.currentPot.eligiblePlayers.includes(player)) {
+          this.currentPot.eligiblePlayers.push(player);
+        }
       });
       // Check for all-in players again.
       allInPlayers = allInPlayers.filter(player => player.bet && player.stackSize === 0);
@@ -285,8 +289,10 @@ export class Table {
     bettingPlayers.forEach(player => {
       if (player.bet === 0) return;
       this.currentPot.amount += player.bet;
-      this.currentPot.eligiblePlayers.push(player);
       player.bet = 0;
+      if (!this.currentPot.eligiblePlayers.includes(player)) {
+        this.currentPot.eligiblePlayers.push(player);
+      }
     });
 
     // Remove any folded players from pot eligibility.

@@ -1,6 +1,6 @@
 {
   "name": "@chevtek/poker-engine",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "A headless no-limit Texas Hold'em engine written completely in node.",
   "main": "./build/index.js",
   "scripts": {

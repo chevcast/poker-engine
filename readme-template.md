@@ -22,7 +22,7 @@ const { Table } = require("{{name}}");
 // new Table(minBuyIn = 1000, smallBlind = 10, bigBlind = 20);
 const table = new Table();
 
-// table.sitDown(id, buyIn);
+// table.sitDown(id, buyIn, seatNumber?);
 table.sitDown("Player 1", 1000);
 table.sitDown("Player 2", 1000);
 table.sitDown("Player 3", 1000);
@@ -151,7 +151,11 @@ This property will return a list of all players who have not folded. Similar to 
 
 The amount of the big blind bet for the table. Default is `20`.
 
-#### `bigBlindPosition: number | undefined`
+#### `bigBlindPlayer?: Player`
+
+If there is a big blind position then this will return the player in that position. Otherwise this returns `undefined`.
+
+#### `bigBlindPosition?: number`
 
 If there is an active hand then this property will return the position of the big blind. Otherwise it will return `undefined`.
 
@@ -163,15 +167,15 @@ The minimum buy-in amount for the table. Default is `1000`.
 
 This is an array of any community cards on the table.
 
-#### `currentActor: Player | undefined`
+#### `currentActor?: Player`
 
 If there is an active hand then this property will return the current player who needs to act. Otherwise this will return `undefined`.
 
-#### `currentBet: number | undefined`
+#### `currentBet?: number`
 
 If there is an active bet that other players must call then this property will return that value. If nobody has opened the bet yet during a betting round then this will be `undefined`.
 
-#### `currentPosition: number | undefined`
+#### `currentPosition?: number`
 
 If there is an active hand then this property will return the position of the current actor. Otherwise it will return `undefined`.
 
@@ -179,15 +183,15 @@ If there is an active hand then this property will return the position of the cu
 
 This property returns the currently active pot, ignoring any side pots.
 
-#### `currentRound: string | undefined`
+#### `currentRound?: string`
 
 If there is an active betting round then this will return one of: `"pre-flop"`, `"flop"`, `"turn"`, `"river"`. Otherwise this will return `undefined`.
 
-#### `dealer: Player | undefined`
+#### `dealer?: Player`
 
 If there is at least one player at the table then the dealer position will be assigned and this property will return the player in the dealer seat. Otherwise this will return `undefined`.
 
-#### `dealerPosition: number | undefined`
+#### `dealerPosition?: number`
 
 If there is an active hand then this property will return the position of the dealer. Otherwise it will return `undefined`.
 
@@ -195,15 +199,19 @@ If there is an active hand then this property will return the position of the de
 
 This property returns a number representing the number of hands played at this table so far.
 
-#### `lastPosition: number | undefined`
+#### `lastActor?: Player`
+
+If `lastPosition` is defined then this will return the player in that position. Otherwise this will return `undefined`.
+
+#### `lastPosition?: number`
 
 If there is an active hand then this property will return the position of the last person to act for the current betting round. Otherwise this will return `undefined`.
 
-#### `lastRaise: number | undefined`
+#### `lastRaise?: number`
 
 If a player has made a raise during the current betting round then this property will return the amount of that raise. Otherwise it will return `undefined`.
 
-#### `players: Player[]`
+#### `players: (Player|null)[]`
 
 This will return an array of all active players currently at the table. See the `Player` properties below to see what they store.
 
@@ -211,7 +219,7 @@ This will return an array of all active players currently at the table. See the 
 
 This will return an array of all pots on the table. Usually there is only one, but of course side pots can form. Each pot stores the amount and the players eligible to win the pot.
 
-#### `sidePots: { amount: number, eligiblePlayers: Player[] }[] | undefined`
+#### `sidePots?: { amount: number, eligiblePlayers: Player[] }[]`
 
 This will return an array of all pots except for the currently active pot. If there are no side pots then this returns `undefined`.
 
@@ -219,23 +227,35 @@ This will return an array of all pots except for the currently active pot. If th
 
 The amount of the small blind bet for the table. Default is `10`.
 
-#### `smallBlindPosition: number | undefined`
+#### `smallBlindPlayer?: Player`
+
+If there is a small blind position then this will return the player in that position. Otherwise this returns `undefined`.
+
+#### `smallBlindPosition?: number`
 
 If there is an active hand then this property will return the position of the small blind. Otherwise this will return `undefined`.
 
-#### `winners: Player[] | undefined`
+#### `winners?: Player[]`
 
 If winners have been determined then then this property will store them. Usually there is only one winner but there can be split pots, in which case this will contain all of the winners in a draw. If there are no winners then this will return `undefined`.
 
 ### Methods
 
+#### `cleanUp(): void`
+
+Resets the table. Good for manually clearing out the winner state after a hand if you need to render the clean table before starting the next hand.
+
 #### `dealCards(): void`
 
 This method begins the hand. Assigns players their hole cards and starts the first round of betting.
 
-#### `sitDown(id: string, buyIn: number): number`
+#### `moveDealer(seatNumber: number): void`
 
-This method allows you to seat a new player at the table. If there is an active hand then they are automatically marked as `folded: true` so that the action will skip them until a new hand is started. This method returns the seat index the player was placed at.
+This method is mostly used internally but it can also be used externally to force the dealer and subsequent blinds into a new position.
+
+#### `sitDown(id: string, buyIn: number, seatNumber?: number): number`
+
+This method allows you to seat a new player at the table. If there is an active hand then they are automatically marked as `folded: true` so that the action will skip them until a new hand is started. This method returns the seat index the player was placed at. You can optionally specify the seat index to put the player into (0 - 9). An error will throw if a player is already in the specified seat.
 
 #### `standUp(player: Player | string): void`
 
@@ -257,7 +277,7 @@ This property stores whether or not the player has folded. By default this is `f
 
 This property returns the user's current hand. `name` is a string representing the type of hand such as `"Flush"` or `"Two Pair"`. `descr` is a string that contains the type of hand and the cards that make up that hand such as `"Two Pair, A's and Q's"`.
 
-#### `holeCards: [Card, Card] | undefined`
+#### `holeCards?: [Card, Card]`
 
 If there is an active hand this property will return a two-element array containing the player's hole cards they have been dealt. Otherwise this will return `undefined`.
 
@@ -269,7 +289,7 @@ A unique ID for the player. This is passed into the `table.sitDown` method when 
 
 This property is `true` if the player has "stood up" from the table but there is an active hand. Players marked with `left: true` will be removed from the table when the hand is over. This way they are still present while the hand they were part of plays out.
 
-#### `raise: number | undefined`
+#### `raise?: number`
 
 This property stores the amount of the player's last raise. If they have not made a raise then this property is `undefined`.
 

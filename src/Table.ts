@@ -28,11 +28,6 @@ export class Table {
     }
   }
 
-  get currentActor () {
-    if (this.currentPosition === undefined) return;
-    return this.players[this.currentPosition];
-  }
-
   get actingPlayers () {
     return this.players.filter(player => player && !player.folded
       && player.stackSize > 0
@@ -44,6 +39,16 @@ export class Table {
     return this.players.filter(player => player && !player.folded) as Player[];
   }
 
+  get bigBlindPlayer () {
+    if (!this.bigBlindPosition) return;
+    return this.players[this.bigBlindPosition];
+  }
+
+  get currentActor () {
+    if (this.currentPosition === undefined) return;
+    return this.players[this.currentPosition];
+  }
+  
   get currentPot () {
     // If there is no pot, create one.
     if (this.pots.length === 0) {
@@ -59,14 +64,9 @@ export class Table {
     return this.players[this.dealerPosition];
   }
 
-  get smallBlindPlayer () {
-    if (!this.smallBlindPosition) return;
-    return this.players[this.smallBlindPosition];
-  }
-
-  get bigBlindPlayer () {
-    if (!this.bigBlindPosition) return;
-    return this.players[this.bigBlindPosition];
+  get lastActor () {
+    if (this.lastPosition === undefined) return;
+    return this.players[this.lastPosition];
   }
 
   get sidePots () {
@@ -76,10 +76,14 @@ export class Table {
     return this.pots.slice(0, this.pots.length - 1)
   }
 
-  moveDealer() {
-    if (this.handNumber > 1) {
-      this.dealerPosition!++;
-    }
+  get smallBlindPlayer () {
+    if (!this.smallBlindPosition) return;
+    return this.players[this.smallBlindPosition];
+  }
+
+  moveDealer(seatNumber: number) {
+    console.log(`Moving dealer to ${seatNumber}`);
+    this.dealerPosition = seatNumber;
     if (this.dealerPosition! >= this.players.length) {
       this.dealerPosition! -= this.players.length * Math.floor(this.dealerPosition! / this.players.length);
     }
@@ -127,14 +131,6 @@ export class Table {
       throw new Error("There is already a player in the requested seat.");
     }
     const newPlayer = new Player(id, buyIn, this);
-    if (this.currentRound) {
-      newPlayer.folded = true;
-    } else {
-      this.cleanUp();
-    }
-    if (this.dealerPosition === undefined || !this.dealer) {
-      this.dealerPosition = seatNumber ?? 0;
-    }
     if (!seatNumber) {
       seatNumber = 0;
       while (this.players[seatNumber] !== null) {
@@ -145,6 +141,12 @@ export class Table {
       }
     }
     this.players[seatNumber] = newPlayer;
+    if (this.currentRound) {
+      newPlayer.folded = true;
+    } else {
+      this.cleanUp();
+      this.moveDealer(this.dealerPosition ?? seatNumber);
+    }
     return seatNumber;
   }
 
@@ -168,8 +170,10 @@ export class Table {
       if (playerIndex === this.dealerPosition) {
         if (this.players.length === 0) {
           delete this.dealerPosition;
+          delete this.smallBlindPosition
+          delete this.bigBlindPosition;
         } else {
-          this.moveDealer();
+          this.moveDealer(this.dealerPosition + 1);
         }
       }
     }
@@ -180,14 +184,9 @@ export class Table {
     const leavingPlayers = this.players.filter(player => player && player.left);
     leavingPlayers.forEach(player => player && this.standUp(player));
 
-    // Grab reference to player in dealer position.
-    const dealer = this.dealer;
     // Remove busted players;
     const bustedPlayers = this.players.filter(player => player && player.stackSize === 0);
     bustedPlayers.forEach(player => player && this.standUp(player));
-    if (dealer) {
-      this.dealerPosition = this.players.indexOf(dealer);
-    }
 
     // Reset player bets, hole cards, and fold status.
     this.players.forEach(player => { 
@@ -222,7 +221,7 @@ export class Table {
     this.cleanUp();
 
     // Ensure there are at least two players.
-    if (this.players.length < 2) {
+    if (this.activePlayers.length < 2) {
       throw new Error("Not enough players to start.");
     }
 
@@ -232,8 +231,10 @@ export class Table {
     // Increase hand number.
     this.handNumber++;
 
-    // Move dealer and blind positions.
-    this.moveDealer();
+    // Move dealer and blind positions if it's not the first hand.
+    if (this.handNumber > 1) {
+      this.moveDealer(this.dealerPosition! + 1);
+    }
 
     // Force small and big blind bets and set current bet amount.
     const sbPlayer = this.players[this.smallBlindPosition!]!;
@@ -244,14 +245,17 @@ export class Table {
     if (this.lastRaise) delete this.lastRaise;
 
     // Set current and last actors.
-    this.currentPosition = this.dealerPosition! + 3;
+    this.currentPosition = this.bigBlindPosition! + 1;
     if (this.currentPosition >= this.players.length) {
       this.currentPosition -= this.players.length * Math.floor(this.currentPosition / this.players.length);
     }
-    this.lastPosition = this.dealerPosition! + 2;
-    if (this.lastPosition >= this.players.length) {
-      this.lastPosition -= this.players.length * Math.floor(this.lastPosition / this.players.length);
+    while (this.currentActor === null) {
+      this.currentPosition!++;
+      if (this.currentPosition! >= this.players.length) {
+        this.currentPosition! -= this.players.length * Math.floor(this.currentPosition! / this.players.length);
+      }
     }
+    this.lastPosition = this.bigBlindPosition!;
 
     // Generate newly shuffled deck.
     this.deck = this.newDeck();
@@ -283,17 +287,17 @@ export class Table {
     // Send the action to the next player.
     this.currentPosition!++;
     if (this.currentPosition! >= this.players.length) {
-      this.currentPosition! -= this.players.length;
+      this.currentPosition! -= this.players.length * Math.floor(this.currentPosition! / this.players.length);
     }
-    while (this.currentActor === null) {
+    while (!this.currentActor || !this.actingPlayers.includes(this.currentActor)) {
       this.currentPosition!++;
       if (this.currentPosition! >= this.players.length) {
-        this.currentPosition! -= this.players.length;
+        this.currentPosition! -= this.players.length * Math.floor(this.currentPosition! / this.players.length);
       }
     }
 
     // If the player has folded or is all-in then move the action again.
-    if (this.currentActor!.folded || this.currentActor!.stackSize === 0 || (!this.currentBet && this.actingPlayers.length === 1)) {
+    if (!this.currentBet && this.actingPlayers.length === 1) {
       this.nextAction();
     }
   }
@@ -358,6 +362,12 @@ export class Table {
       this.currentPosition = this.dealerPosition! + 1;
       if (this.currentPosition === this.players.length) {
         this.currentPosition = 0;
+      }
+      while (this.currentActor === null) {
+        this.currentPosition++;
+        if (this.currentPosition === this.players.length) {
+          this.currentPosition = 0;
+        }
       }
       this.lastPosition = this.dealerPosition!;
       if (!this.actingPlayers.includes(this.currentActor!) || this.actingPlayers.length <= 1) {

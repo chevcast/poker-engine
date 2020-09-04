@@ -82,7 +82,6 @@ export class Table {
   }
 
   moveDealer(seatNumber: number) {
-    console.log(`Moving dealer to ${seatNumber}`);
     this.dealerPosition = seatNumber;
     if (this.dealerPosition! >= this.players.length) {
       this.dealerPosition! -= this.players.length * Math.floor(this.dealerPosition! / this.players.length);

@@ -151,31 +151,37 @@ export class Table {
   }
 
   standUp(player: Player | string): void {
+    let playersToStandUp: Player[];
     if (typeof player === "string") {
-      const [foundPlayer] = this.players.filter(p => p && p.id === player);
-      if (!foundPlayer) {
+      playersToStandUp = this.players.filter(p => p && p.id === player && !p.left) as Player[];
+      if (playersToStandUp.length === 0) {
         throw new Error(`No player found.`);
       }
-      player = foundPlayer;
-    }
-    if (this.currentRound) {
-      player.folded = true;
-      player.left = true;
-      if (this.currentActor === player) {
-        this.nextAction();
-      }
     } else {
-      const playerIndex = this.players.indexOf(player);
-      this.players[playerIndex] = null;
-      if (playerIndex === this.dealerPosition) {
-        if (this.players.length === 0) {
-          delete this.dealerPosition;
-          delete this.smallBlindPosition
-          delete this.bigBlindPosition;
-        } else {
-          this.moveDealer(this.dealerPosition + 1);
+      playersToStandUp = this.players.filter(p => p === player && !p.left) as Player[];
+    }
+    while (playersToStandUp.length > 0) {
+      const [player] = playersToStandUp;
+      if (this.currentRound) {
+        player.folded = true;
+        player.left = true;
+        if (this.currentActor === player) {
+          this.nextAction();
+        }
+      } else {
+        const playerIndex = this.players.indexOf(player);
+        this.players[playerIndex] = null;
+        if (playerIndex === this.dealerPosition) {
+          if (this.players.length === 0) {
+            delete this.dealerPosition;
+            delete this.smallBlindPosition
+            delete this.bigBlindPosition;
+          } else {
+            this.moveDealer(this.dealerPosition + 1);
+          }
         }
       }
+      playersToStandUp.splice(playersToStandUp.indexOf(player), 1);
     }
   }
 

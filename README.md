@@ -1,4 +1,4 @@
-# @chevtek/poker-engine v1.1.2
+# @chevtek/poker-engine v1.2.0
 
 A headless no-limit Texas Hold'em engine written completely in node.
 
@@ -147,6 +147,10 @@ This property will return a list of all players that are still in play and able 
 
 This property will return a list of all players who have not folded. Similar to `actingPlayers` except it does not include players who are all-in.
 
+#### `autoMoveDealer: boolean = true`
+
+This property determines if the dealer position should automatically increment when `dealCards` is called. By default this is `true`. However it can be useful to know who the next dealer will be _before_ calling `dealCards` to begin a new hand. In that case you can set this to false. Just keep in mind that you will have to manually call `table.moveDealer(table.dealerPosition + 1)` before calling `dealCards` or you will begin a new hand from the same dealer position as the previous hand.
+
 #### `bigBlind: number = 20`
 
 The amount of the big blind bet for the table. Default is `20`.
@@ -251,7 +255,7 @@ This method begins the hand. Assigns players their hole cards and starts the fir
 
 #### `moveDealer(seatNumber: number): void`
 
-This method is mostly used internally but it can also be used externally to force the dealer and subsequent blinds into a new position.
+This method is mostly used internally but it can also be used externally to force the dealer and subsequent blinds into a new position. By default the `dealCards` method calls this when starting new hands to automatically increment the dealer position. If for some reason you want to manually increment the dealer position between hands then set `autoMoveDealer` to `false`. This can be useful if you need to know who the next dealer will be _before_ you call `dealCards` to start the next hand.
 
 #### `sitDown(id: string, buyIn: number, seatNumber?: number): number`
 

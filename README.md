@@ -1,4 +1,4 @@
-# @chevtek/poker-engine v1.2.0
+# @chevtek/poker-engine v1.2.1
 
 A headless no-limit Texas Hold'em engine written completely in node.
 
@@ -256,6 +256,8 @@ This method begins the hand. Assigns players their hole cards and starts the fir
 #### `moveDealer(seatNumber: number): void`
 
 This method is mostly used internally but it can also be used externally to force the dealer and subsequent blinds into a new position. By default the `dealCards` method calls this when starting new hands to automatically increment the dealer position. If for some reason you want to manually increment the dealer position between hands then set `autoMoveDealer` to `false`. This can be useful if you need to know who the next dealer will be _before_ you call `dealCards` to start the next hand.
+
+> _**Note:** This method automatically accounts for empty seats and looping back around to seat 0. So calling `table.moveDealer(table.dealerPosition + 1)` is perfectly valid even if `table.dealerPosition` is the last seat at the table or if the next seat is empty._
 
 #### `sitDown(id: string, buyIn: number, seatNumber?: number): number`
 

@@ -2,6 +2,7 @@ import { Hand } from "pokersolver";
 import { Card, CardSuit, CardRank, Player } from ".";
 
 export class Table {
+  public autoMoveDealer: boolean = true;
   public bigBlindPosition?: number;
   public communityCards: Card[] = [];
   public currentBet?: number;
@@ -231,7 +232,7 @@ export class Table {
     this.handNumber++;
 
     // Move dealer and blind positions if it's not the first hand.
-    if (this.handNumber > 1) {
+    if (this.handNumber > 1 && this.autoMoveDealer) {
       this.moveDealer(this.dealerPosition! + 1);
     }
 

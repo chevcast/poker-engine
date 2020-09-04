@@ -289,15 +289,12 @@ export class Table {
     if (this.currentPosition! >= this.players.length) {
       this.currentPosition! -= this.players.length * Math.floor(this.currentPosition! / this.players.length);
     }
-    while (!this.currentActor || !this.actingPlayers.includes(this.currentActor)) {
-      this.currentPosition!++;
-      if (this.currentPosition! >= this.players.length) {
-        this.currentPosition! -= this.players.length * Math.floor(this.currentPosition! / this.players.length);
-      }
-    }
 
-    // If the player has folded or is all-in then move the action again.
-    if (!this.currentBet && this.actingPlayers.length === 1) {
+    // if the current actor is null, not an acting player, or if the player has folded or is all-in then move the action again.
+    if (
+      !this.currentActor
+      || !this.actingPlayers.includes(this.currentActor)
+      || (!this.currentBet && this.actingPlayers.length === 1)) {
       this.nextAction();
     }
   }

@@ -165,7 +165,7 @@ export class Table {
       if (this.currentRound) {
         player.folded = true;
         player.left = true;
-        if (this.currentActor === player) {
+        if (this.currentActor === player || this.actingPlayers.length <= 1) {
           this.nextAction();
         }
       } else {

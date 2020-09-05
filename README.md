@@ -1,4 +1,4 @@
-# @chevtek/poker-engine v1.2.7
+# @chevtek/poker-engine v1.2.8
 
 A headless no-limit Texas Hold'em engine written completely in node.
 

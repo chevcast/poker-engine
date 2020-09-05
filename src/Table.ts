@@ -83,6 +83,9 @@ export class Table {
   }
 
   moveDealer(seatNumber: number) {
+    if (this.players.filter(player => player !== null).length === 0) {
+      throw new Error("Move dealer was called but there are no seated players.");
+    }
     this.dealerPosition = seatNumber;
     if (this.dealerPosition! >= this.players.length) {
       this.dealerPosition! -= this.players.length * Math.floor(this.dealerPosition! / this.players.length);

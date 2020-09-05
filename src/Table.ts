@@ -41,7 +41,7 @@ export class Table {
   }
 
   get bigBlindPlayer () {
-    if (!this.bigBlindPosition) return;
+    if (this.bigBlindPosition === undefined) return;
     return this.players[this.bigBlindPosition];
   }
 
@@ -61,7 +61,7 @@ export class Table {
   }
 
   get dealer () {
-    if (!this.dealerPosition) return;
+    if (this.dealerPosition === undefined) return;
     return this.players[this.dealerPosition];
   }
 
@@ -78,7 +78,7 @@ export class Table {
   }
 
   get smallBlindPlayer () {
-    if (!this.smallBlindPosition) return;
+    if (this.smallBlindPosition === undefined) return;
     return this.players[this.smallBlindPosition];
   }
 

@@ -248,10 +248,19 @@ export class Table {
     // Force small and big blind bets and set current bet amount.
     const sbPlayer = this.players[this.smallBlindPosition!]!;
     const bbPlayer = this.players[this.bigBlindPosition!]!
-    sbPlayer.stackSize -= sbPlayer.bet = this.smallBlind;
-    bbPlayer.stackSize -= bbPlayer.bet = this.bigBlind;
+    if (this.smallBlind > sbPlayer.stackSize) {
+      sbPlayer.bet = sbPlayer.stackSize;
+      sbPlayer.stackSize = 0;
+    } else {
+      sbPlayer.stackSize -= sbPlayer.bet = this.smallBlind;
+    }
+    if (this.bigBlind > bbPlayer.stackSize) {
+      bbPlayer.bet = bbPlayer.stackSize;
+      bbPlayer.stackSize = 0;
+    } else {
+      bbPlayer.stackSize -= bbPlayer.bet = this.bigBlind;
+    }
     this.currentBet = this.bigBlind;
-    if (this.lastRaise) delete this.lastRaise;
 
     // Set current and last actors.
     this.currentPosition = this.bigBlindPosition! + 1;

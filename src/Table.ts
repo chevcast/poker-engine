@@ -172,7 +172,7 @@ export class Table {
         const playerIndex = this.players.indexOf(player);
         this.players[playerIndex] = null;
         if (playerIndex === this.dealerPosition) {
-          if (this.players.length === 0) {
+          if (this.players.filter(player => player !== null).length === 0) {
             delete this.dealerPosition;
             delete this.smallBlindPosition
             delete this.bigBlindPosition;

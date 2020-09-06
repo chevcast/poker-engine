@@ -322,6 +322,8 @@ export class Table {
     // Obtain all players who placed bets.
     const bettingPlayers = this.players.filter(player => player && player.bet > 0);
 
+    if (bettingPlayers.length <= 1) return;
+
     // Check for all-in players.
     let allInPlayers = bettingPlayers.filter(player => player && player.bet && player.stackSize === 0);
 

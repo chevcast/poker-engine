@@ -153,7 +153,7 @@ export class Table {
     return seatNumber;
   }
 
-  standUp(player: Player | string): void {
+  standUp(player: Player | string) {
     let playersToStandUp: Player[];
     if (typeof player === "string") {
       playersToStandUp = this.players.filter(p => p && p.id === player && !p.left) as Player[];
@@ -163,8 +163,7 @@ export class Table {
     } else {
       playersToStandUp = this.players.filter(p => p === player && !p.left) as Player[];
     }
-    while (playersToStandUp.length > 0) {
-      const [player] = playersToStandUp;
+    for (const player of playersToStandUp) {
       if (this.currentRound) {
         player.folded = true;
         player.left = true;
@@ -184,8 +183,8 @@ export class Table {
           }
         }
       }
-      playersToStandUp.splice(playersToStandUp.indexOf(player), 1);
     }
+    return playersToStandUp;
   }
 
   cleanUp () {

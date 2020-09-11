@@ -19,7 +19,7 @@ This engine is designed around an instance of a `Table`. Simply create a new tab
 ```js
 const { Table } = require("{{name}}");
 
-// new Table(minBuyIn = 1000, smallBlind = 10, bigBlind = 20);
+// new Table(minBuyIn = 1000, smallBlind = 5, bigBlind = 10);
 const table = new Table();
 
 // table.sitDown(id, buyIn, seatNumber?);
@@ -151,7 +151,7 @@ This property will return a list of all players who have not folded. Similar to 
 
 This property determines if the dealer position should automatically increment when `dealCards` is called. By default this is `true`. However it can be useful to know who the next dealer will be _before_ calling `dealCards` to begin a new hand. In that case you can set this to false. Just keep in mind that you will have to manually call `table.moveDealer(table.dealerPosition + 1)` before calling `dealCards` or you will begin a new hand from the same dealer position as the previous hand.
 
-#### `bigBlind: number = 20`
+#### `bigBlind: number = 10`
 
 The amount of the big blind bet for the table. Default is `20`.
 
@@ -227,7 +227,7 @@ This will return an array of all pots on the table. Usually there is only one, b
 
 This will return an array of all pots except for the currently active pot. If there are no side pots then this returns `undefined`.
 
-#### `smallBlind: number = 10`
+#### `smallBlind: number = 5`
 
 The amount of the small blind bet for the table. Default is `10`.
 

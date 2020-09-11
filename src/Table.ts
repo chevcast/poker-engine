@@ -21,8 +21,8 @@ export class Table {
 
   constructor (
     public buyIn: number = 1000,
-    public smallBlind: number = 10,
-    public bigBlind: number = 20
+    public smallBlind: number = 5,
+    public bigBlind: number = 10
   ) {
     if (smallBlind >= bigBlind) {
       throw new Error("The small blind must be less than the big blind.");

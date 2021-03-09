@@ -310,3 +310,29 @@ This property stores the amount of money the player has left. The initial value 
 #### `table: Table`
 
 This property is simply a convenience reference back to the table the player is part of.
+
+### Methods
+
+#### `betAction(amount: number): void`
+
+This method is used when the player would like to bet the specified amount. An error is thrown if the action is not legal at the time.
+
+#### `callAction(): void`
+
+This method is used when the player would like to contribute the minimum amount to continue. An error is thrown if the action is not legal at the time.
+
+#### `checkAction(): void`
+
+This method is used when the player would like to pass on betting. An error is thrown if the action is not legal at the time.
+
+#### `foldAction(): void`
+
+This method is used when the player would like to fold. An error is thrown if the action is not legal at the time.
+
+#### `legalActions(): string[]`
+
+This method provides an array of all possible actions that can be made. Will always at least contain `"fold"`, but can also contain any number of the following: `"bet"`, `"call"`, `"check"`, and `"raise"` 
+
+#### `raiseAction(amount: number): void`
+
+This method is used when the player would like to raise the bet to the specified amount. An error is thrown if the action is not legal at the time.

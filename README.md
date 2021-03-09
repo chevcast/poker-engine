@@ -86,13 +86,13 @@ table.currentActor.checkAction();
 table.currentActor.betAction(20);
 
 // player 1 raises.
-table.currentActor.raise(40);
+table.currentActor.raiseAction(40);
 
 // player 2 calls.
-table.currentActor.call();
+table.currentActor.callAction();
 
 // player 3 calls player 1's raise.
-table.currentActor.call();
+table.currentActor.callAction();
 
 // betting has been met, player 2 is first to act on the turn and all three decide to check.
 table.currentActor.checkAction();
@@ -153,7 +153,7 @@ This property determines if the dealer position should automatically increment w
 
 #### `bigBlind: number = 10`
 
-The amount of the big blind bet for the table. Default is `20`.
+The amount of the big blind bet for the table. Default is `10`.
 
 #### `bigBlindPlayer?: Player`
 
@@ -229,7 +229,7 @@ This will return an array of all pots except for the currently active pot. If th
 
 #### `smallBlind: number = 5`
 
-The amount of the small blind bet for the table. Default is `10`.
+The amount of the small blind bet for the table. Default is `5`.
 
 #### `smallBlindPlayer?: Player`
 
@@ -310,3 +310,29 @@ This property stores the amount of money the player has left. The initial value 
 #### `table: Table`
 
 This property is simply a convenience reference back to the table the player is part of.
+
+### Methods
+
+#### `betAction(amount: number): void`
+
+This method is used when the player would like to bet the specified amount. An error is thrown if the action is not legal at the time.
+
+#### `callAction(): void`
+
+This method is used when the player would like to contribute the minimum amount to continue. An error is thrown if the action is not legal at the time.
+
+#### `checkAction(): void`
+
+This method is used when the player would like to pass on betting. An error is thrown if the action is not legal at the time.
+
+#### `foldAction(): void`
+
+This method is used when the player would like to fold. An error is thrown if the action is not legal at the time.
+
+#### `legalActions(): string[]`
+
+This method provides an array of all possible actions that can be made. Will always at least contain `"fold"`, but can also contain any number of the following: `"bet"`, `"call"`, `"check"`, and `"raise"` 
+
+#### `raiseAction(amount: number): void`
+
+This method is used when the player would like to raise the bet to the specified amount. An error is thrown if the action is not legal at the time.

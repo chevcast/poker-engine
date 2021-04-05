@@ -90,7 +90,7 @@ export class Table {
     if (this.dealerPosition! >= this.players.length) {
       this.dealerPosition! -= this.players.length * Math.floor(this.dealerPosition! / this.players.length);
     }
-    while (this.dealer === null) {
+    while (this.dealer === null && this.players.length > 0) {
       this.dealerPosition!++;
       if (this.dealerPosition! >= this.players.length) {
         this.dealerPosition! -= this.players.length * Math.floor(this.dealerPosition! / this.players.length);
@@ -100,7 +100,7 @@ export class Table {
     if (this.smallBlindPosition >= this.players.length) {
       this.smallBlindPosition -= this.players.length * Math.floor(this.smallBlindPosition / this.players.length);
     }
-    while (this.smallBlindPlayer === null) {
+    while (this.smallBlindPlayer === null && this.players.length > 0) {
       this.smallBlindPosition!++;
       if (this.smallBlindPosition! >= this.players.length) {
         this.smallBlindPosition! -= this.players.length * Math.floor(this.smallBlindPosition! / this.players.length);
@@ -110,7 +110,7 @@ export class Table {
     if (this.bigBlindPosition >= this.players.length) {
       this.bigBlindPosition -= this.players.length * Math.floor(this.bigBlindPosition / this.players.length);
     }
-    while (this.bigBlindPlayer === null) {
+    while (this.bigBlindPlayer === null && this.players.length > 0) {
       this.bigBlindPosition!++;
       if (this.bigBlindPosition! >= this.players.length) {
         this.bigBlindPosition! -= this.players.length * Math.floor(this.bigBlindPosition! / this.players.length);
@@ -266,7 +266,7 @@ export class Table {
     if (this.currentPosition >= this.players.length) {
       this.currentPosition -= this.players.length * Math.floor(this.currentPosition / this.players.length);
     }
-    while (this.currentActor === null) {
+    while (this.currentActor === null && this.players.length > 0) {
       this.currentPosition!++;
       if (this.currentPosition! >= this.players.length) {
         this.currentPosition! -= this.players.length * Math.floor(this.currentPosition! / this.players.length);
@@ -377,7 +377,7 @@ export class Table {
     });
 
     // Remove any folded players from pot eligibility.
-    this.pots.forEach(pot => pot.eligiblePlayers = pot.eligiblePlayers.filter(player => !player.folded));
+    this.pots.forEach(pot => pot.eligiblePlayers = pot.eligiblePlayers.filter(player => !player.folded && !player.left));
   }
 
   nextRound () {
@@ -388,9 +388,9 @@ export class Table {
       if (this.currentPosition === this.players.length) {
         this.currentPosition = 0;
       }
-      while (this.currentActor === null) {
+      while (this.currentActor === null && this.players.length > 0) {
         this.currentPosition++;
-        if (this.currentPosition === this.players.length) {
+        if (this.currentPosition >= this.players.length) {
           this.currentPosition = 0;
         }
       }

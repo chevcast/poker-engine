@@ -15,7 +15,7 @@ export class Card {
     return this._suit;
   }
 
-  get color() {
+  get color(): CardColor {
     switch (this._suit) {
       case CardSuit.CLUB:
       case CardSuit.SPADE:
